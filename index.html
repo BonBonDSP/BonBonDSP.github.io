@@ -1,0 +1,500 @@
+<!DOCTYPE HTML>
+<!--
+Bon Bon Data Science Professional Project
+-->
+<html>
+	<head>
+		<title>Bon Bon Data Science Professional Project</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="fade-in">
+
+				<!-- Intro -->
+					<div id="intro">
+						<h1>Bon Bon<br />
+						Data Science Professional Project</h1>
+						<p>Logistic Regression on Airline Customer satisfaction created by <a href="https://github.com/BonBonBPP/DSPP.github.io">BonBon</a> for a Data Science Project<br />
+						</p>
+						<ul class="actions">
+							<li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
+						</ul>
+					</div>
+
+				<!-- Header -->
+					<header id="header">
+						<a href="index.html" class="logo">Bon Bon</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li class="active"><a href="index.html">Logistic Regression Project</a></li>
+							<!-- <li><a href="generic.html">Generic Page</a></li> -->
+							<!-- <li><a href="elements.html">Elements Reference</a></li> -->
+						</ul>
+						<ul class="icons">
+							<!-- <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li> -->
+							<!-- <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li> -->
+							<!-- <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li> -->
+							<li><a href="https://github.com/BonBonBPP" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Featured Post -->
+							<article class="post featured">
+								<header class="major">
+									<span class="date">8 August 2024</span>
+									<h2>Logistic Regression <br />
+									on Customer satisfaction</h2>
+									<p>This project revolves around try to understand what correlation and predictors can be used for a 
+										public dataset taken from Kaggle containing airline customer satastifaction information. 
+										I will be reviewing some public data found that relates to airline passenger satisfaction from a dataset found from the resource Kaggle. 
+										I will be using a logistic regression model to determine which factors are most likely to lead to satisfaction and then build the model to be able to predict if new data was fed into the model, predict if the customer would be satisfied or not. 
+										The overall research question for this data is, which service quality factors most significantly predict passenger satisfaction in airline services, 
+										and to what extent do they influence the likelihood of a passenger being satisfied.
+									</p>
+								</header>
+							<!--
+								<a href="#" class="image main"><img src="images/pic01.jpg" alt="" /></a>
+								<ul class="actions special">
+									<li><a href="#" class="button large">Full Story</a></li>
+								</ul>
+							-->
+							</article>
+						<main>
+							<h2>Dataset Description</h2>
+							<p>This dataset contains an airline passenger satisfaction survey. It contains data that is a high level view of non-identifable information of the customer and then some data that would contribute to understanding factors that may help understand what correlated to satisfaction.
+
+								The data has been pulled from a public source <a href="//www.kaggle.com/datasets/teejmahal20/airline-passenger-satisfaction"> Kaggle Dataset</a> into a CSV file format, I have chosen to use Python because of the number of rows of data exceeding 100,000+, 
+								whereas excel can handle this it’s already beginning to exceed a point where excel will handle it comfortably and I will notice overhead issues.</p>
+							<h2>Tool Usage</h2>
+							<p>Python was used to build this model, using a Jupyter notebook to document findings, graphicals and explain methods. 
+								In my project, I utilised several Python libraries to perform data analysis, visualisation, and model evaluation. 
+								I used <code>pandas</code> allowing me to efficiently load, clean, and preprocess the dataset. 
+								For splitting the data into training and testing sets, I employed the <code>train_test_split</code> function from the <code>sklearn.model_selection</code> module, which is essential for ensuring the model's performance can be properly validated. 
+								To create visualisations, I used <code>seaborn</code>, for drawing informative statistical graphics. Additionally, I used <code>matplotlib.pyplot</code> for visualisations.
+							</p>
+							<h2>Data Cleansing</h2>
+							<p>Little was required in terms of cleaning the data, mapping the dependent variables to boolean values (so changing Satisfied to a 1 and neutral or dissatisfied to a 0) was done to allow a logistic regression model to be performed on this dataset.
+								Columns such as Arrival/Depature delay are normalised, using StandardScaler, the data was normalised to create better performance in the model, because the ‘Delay in minutes’ columns had a wider range, normalising the data in these columns allows the data the to train faster because the data is easier to work as the scale has been reduced to closer to 0. This improves the models performance as the data is on a similar scale.
+								
+								Null values were replaced on Delay columns with the mean to prevent the need to remove data from the datasets. Because of the low percentage of missing values, imputation is a sensible approach to replacing these missing values with the mean of those fields.
+								
+								The data is split into 2 data files for training and testing the data, totaling up to be 125,000+ rows of data.</p>
+							<h3>Importing code and loading datasets</h3>
+							<pre><code>
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc, classification_report
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load the dataset
+train_df = pd.read_csv('train.csv')
+test_df = pd.read_csv('test.csv')
+#Map the values for the dependent variables to Boolean values to be used later in the model
+train_df['satisfaction'] = train_df['satisfaction'].map({'satisfied': 1, 'neutral or dissatisfied': 0})
+test_df['satisfaction'] = test_df['satisfaction'].map({'satisfied': 1, 'neutral or dissatisfied': 0})
+
+#Search for number null values
+train_df.isnull().sum()
+							</code></pre>
+							<pre><code>
+Unnamed: 0                             0
+id                                     0
+Gender                                 0
+Customer Type                          0
+Age                                    0
+Type of Travel                         0
+Class                                  0
+Flight Distance                        0
+Inflight wifi service                  0
+Departure/Arrival time convenient      0
+Ease of Online booking                 0
+Gate location                          0
+Food and drink                         0
+Online boarding                        0
+Seat comfort                           0
+Inflight entertainment                 0
+On-board service                       0
+Leg room service                       0
+Baggage handling                       0
+Checkin service                        0
+Inflight service                       0
+Cleanliness                            0
+Departure Delay in Minutes             0
+Arrival Delay in Minutes             310
+satisfaction                           0
+dtype: int64
+							</code>
+							</pre>
+							<pre>
+<code>test_df.isnull().sum()</code>
+						</pre>
+<pre><code>
+Unnamed: 0                            0
+id                                    0
+Gender                                0
+Customer Type                         0
+Age                                   0
+Type of Travel                        0
+Class                                 0
+Flight Distance                       0
+Inflight wifi service                 0
+Departure/Arrival time convenient     0
+Ease of Online booking                0
+Gate location                         0
+Food and drink                        0
+Online boarding                       0
+Seat comfort                          0
+Inflight entertainment                0
+On-board service                      0
+Leg room service                      0
+Baggage handling                      0
+Checkin service                       0
+Inflight service                      0
+Cleanliness                           0
+Departure Delay in Minutes            0
+Arrival Delay in Minutes             83
+satisfaction                          0
+dtype: int64</code>
+							</pre>
+							<h3>Normalising Data</h3>
+							<p>Using StandardScaler, the data was normalised to create better performance in the model, because the ‘Delay in minutes’ columns had a wider range, normalising the data in these columns allows the data the to train faster because the data is easier to work as the scale has been reduced to closer to 0. 
+								This improves the models performance as the data is on a similar scale.</p>
+<pre><code>#Replace null values using imputation for mean values of the relevant fields.
+train_df['Arrival Delay in Minutes'].fillna(train_df['Arrival Delay in Minutes'].mean(), inplace=True)
+train_df['Departure Delay in Minutes'].fillna(train_df['Departure Delay in Minutes'].mean(), inplace=True)
+test_df['Arrival Delay in Minutes'].fillna(test_df['Arrival Delay in Minutes'].mean(), inplace=True)
+test_df['Departure Delay in Minutes'].fillna(test_df['Departure Delay in Minutes'].mean(), inplace=True)
+
+# Initialise the scaler
+scaler = StandardScaler()
+
+#Normalise the numerical features in the training data set 
+train_df[['Arrival Delay in Minutes', 'Departure Delay in Minutes']] = scaler.fit_transform(train_df[['Arrival Delay in Minutes', 'Departure Delay in Minutes']])
+# Normalise the numerical features in the testing data set
+test_df[['Arrival Delay in Minutes', 'Departure Delay in Minutes']] = scaler.transform(test_df[['Arrival Delay in Minutes', 'Departure Delay in Minutes']])</code></pre>
+							<h2>Exploratory Data Analysis</h2>
+							<h3>Data suitablity</h3>
+							<p>Checking the suitabilty of the data in terms of the balance of what we are predicting in logistic regression is important as imbalanced classes in dependent variables can lead to several issues, including the risk of overfitting. However, overfitting itself is not the most immediate risk; rather, the primary concerns are:
+
+								Bias towards the majority class: The model may become biased towards predicting the majority class, leading to poor performance on the minority class. This means the model might predict "satisfied" for most cases, even when the true label is "dissatisfied."
+								
+								Poor generalisation: The model may not generalize well to new data, particularly for the minority class. This happens because the model doesn't learn enough about the minority class to make accurate predictions.
+								The training data is measured on the left and the test data is measured on the right.</p>
+							<img src="images/SatisfiedDistri.png" alt="Satisfied Distribution">
+							<img src="images/SatisfiedDistri2.png" alt="Satisfied Distribution 2">
+							<p>the fairly equal spread suggests this data will be suitable to create a model against and there should be a lower risk of bias or poor generalisation.</p>
+							<h3>Understanding spread of data in independent variables</h3>
+							<pre><p>Viewing the spread of the independent variables helps us to understand the likely potential predictators in our model.
+
+Gender:
+Almost equal distribution between male (49%) and female (51%).
+
+Customer Type:
+Majority are loyal customers (82%) compared to disloyal customers (18%).
+
+Type of Travel:
+Higher proportion of business travel (69%) than personal travel (31%).
+
+Class:
+Predominantly business class (48%), followed by economy class (45%), and a small portion in economy plus (7%).
+
+Inflight Wifi Service:
+Ratings are fairly distributed with higher counts in mid-ranges (2, 3, 4) and fewer in extremes (1, 5).
+
+Departure/Arrival Time Convenient:
+Similar distribution across ratings with slightly fewer extremes.
+
+Ease of Online Booking:
+More ratings in the mid-range (2, 3, 4) with fewer extreme ratings.
+
+Gate Location:
+Again, higher distribution in the mid-ranges (2, 3, 4).
+
+Food and Drink:
+Mid-range ratings are more common, with fewer extremes.
+
+Online Boarding:
+Significant portion of high ratings (4, 5), indicating satisfaction with this service.
+
+Seat Comfort:
+Mixed distribution with no clear concentration in any specific rating.
+
+Inflight Entertainment:
+More mid-range ratings with fewer extremes.
+
+On-Board Service:
+Evenly spread across mid-range ratings, with fewer extremes.
+
+Leg Room Service:
+Similar mid-range distribution with fewer extremes.
+
+Baggage Handling:
+Higher satisfaction (rating 5) is noticeable compared to other ratings.
+
+Check-In Service:
+Predominantly higher ratings (4, 5), indicating satisfaction.
+
+Inflight Service:
+Higher ratings (4, 5) suggest good service quality.
+
+Cleanliness:
+More concentrated in the higher ratings (4, 5), indicating cleanliness satisfaction.
+							</p></pre>
+							<h3>Data Distribution:</h3>
+							<p>The data is fairly balanced in terms of gender, with noticeable skewness towards loyal customers and business travel.
+								Service ratings generally show a higher frequency of mid-range values, indicating moderate satisfaction levels.</p>
+							<h4>Potential Predictors:</h4>
+							<p>Customer type and class may be strong predictors due to the clear majority in certain categories.
+								Service ratings like online boarding, inflight service, check-in service, and cleanliness might be significant predictors given their higher satisfaction levels.</p>
+							<img class="ImageShrink"  src="images/FIeldGraphicals.png" alt="Feature Graphicals">
+							<h3>Confusion Matrix of Results</h3>
+							<img src="images/ConfusionMatrix.png" alt="Confusion Matrix">
+							<h2>Feature Importance</h2>
+							<p>Using feature importance to see Coefficients measured here influence from some variables, suggesting that the odds of satisfaction increase with each unit increase in things like Online boarding, inflight entertainment etc. 
+								and conversely the odds of dissatisfaction increase with things like Departure/arrival time, as these increases the satisfaction will drop</p>
+							<img src="images/FeatureImportance.png" alt="Important Features">
+							<h2>Interpretation of the ROC Curve</h2>
+							<p>The ROC curve and the AUC value of 0.84 suggest that the model has strong performance in distinguishing between the two classes. It is effective at identifying true positives while maintaining a relatively low rate of false positives. This implies that the model is reliable for the given classification task.</p>
+							<img src="images/ROC.png" alt="ROC Graph">
+							<h2>Model Performance</h2>
+							<p>The models accuracy was measured at 77% and the Precision, Recall and F1 score were measured at 74%. With a measure of ROC AUC 84%, indicating the model has a good discrimination capability between the measured variable of satisfied and dissatisfied customers.
+								Finally the confusion matrix measurement showed actual figures of a balanced performance between the classes.</p>
+							<h2>Ethical Considerations</h2>
+							<p>This dataset is public and any personal identifiable information was redacted or not recorded to prevent any privacy concerns, adhering to GDPR and data protection laws. 
+							The application of the model is designed to enhance customer experience in theory by seeing what factors improve satisfaction and are not designed to be intrusive.</p>
+							<h2>Challenges with Features</h2>
+							<h3>Challenges in Processing Data</h3>
+							<ol>
+								<strong><li>Handling Missing Values:</li></strong>
+								<ul>
+									<strong><li>Challenge:</strong> The <code>Arrival Delay in Minutes</code> column had missing values that could skew the results.</li>
+									<strong><li>Solution:</strong> Imputed missing values with the mean, preventing missing values harming the results.</li>
+								</ul>
+								<strong><li>Data Volume:</strong></li>
+								<ul>
+									<strong><li>Challenge:</strong> The dataset contained over 100,000 rows and 25 columns, leading to high memory usage and longer computation times.</li>
+									<strong><li>Solution:</strong> Efficient data handling techniques and using libraries like Pandas and Scikit-learn to streamline preprocessing and model training.</li>
+								</ul>
+								<strong><li>Categorical Data:</strong></li>
+								<ul>
+									<strong><li>Challenge:</strong> Categorical features (e.g., <code>`Gender`, `Customer Type`, `Type of Travel`, `Class`</code>) needed to be converted into numerical format for the logistic regression model.</li>
+									<strong><li>Solution:</strong> Applied one-hot encoding to convert categorical variables into a format suitable for machine learning algorithms.</li>
+								</ul>
+							</ol>
+							<h3>Challenges in Visualising Data</h3>
+							<ol>
+								<strong><li>Feature Richness:</li></strong>
+								<ul>
+									<strong><li>Challenge:</strong> With 25 features, visualising relationships and distributions is complex.</li>
+									<strong><li>Solution:</strong>Utilised correlation heatmaps and plotting spread against features to understand the distribution and relationships between features and the target variable.</li>
+								</ul>
+								<strong><li>Imbalanced Classes:</strong></li>
+								<ul>
+									<strong><li>Challenge:</strong> The <code>satisfaction</code> target variable might be imbalanced, affecting visualisation clarity.</li>
+									<strong><li>Solution:</strong> Plotted the distribution of the target variable to check for imbalance and used stratified sampling during train-test split.</li>
+								</ul>
+							</ol>
+							<h3>Feature Engineering Performed</h3>	
+							<ol>
+								<strong><li>Encoding Target Variable:</li></strong>
+								<ul>
+									<strong><li></strong> Converted the <code>satisfaction</code> column from categorical (e.g., "neutral or dissatisfied", "satisfied") to binary (0 and 1).</li>
+								</ul>
+								<strong><li>Handling Categorical Features:</strong></li>
+								<ul>
+									<strong><li></strong>Applied one-hot encoding to categorical features to convert them into numerical format.</li>
+								</ul>
+								<strong><li>Scaling Numerical Features:</strong></li>
+								<ul>
+									<strong><li></strong>Standardised numerical features to have a mean of 0 and a standard deviation of 1, which helps in improving the performance of the logistic regression model.</li>
+								</ul>
+								<strong><li>Imputing Missing Values:</strong></li>
+								<ul>
+									<strong><li></strong>Imputed missing values in the <code>Arrival Delay in Minutes</code> column with the mean to ensure completeness of data without introducing bias from extreme values.</li>
+								</ul>
+							</ol>
+						<h2>Conclusion</h2>
+						<p>The overall analysis when related to the research question highlight that variables such as seat comfort, online booking, inflight entertainment etc. were the biggest contributors to satisfaction and should be used to improve the experience for customers, when measuring this data, it can be reliably used within this model to assess whether a customer is likely to be a satisfied customer, but continuous monitoring and updating of the model are necessary to adapt to changing customer preferences and ensure sustained performance. The models performance could further be improved in the future by recording/creating new features to capture underlying patterns better.
+							I also think there could be confounding variables that haven't been recorded within this data but it cannot be confirmed by this dataset alone. More research is required by myself to utilise things like 
+							using SHAP (SHapley Additive exPlanations) values or LIME (Local Interpretable Model-agnostic Explanations) to understand and validate the influence of each feature on the predictions.
+							</p>
+						</main>
+						<!-- Posts
+							<section class="posts">
+								<article>
+									<header>
+										<span class="date">April 24, 2017</span>
+										<h2><a href="#">Sed magna<br />
+										ipsum faucibus</a></h2>
+									</header>
+									<a href="#" class="image fit"><img src="images/pic02.jpg" alt="" /></a>
+									<p>Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis magna etiam.</p>
+									<ul class="actions special">
+										<li><a href="#" class="button">Full Story</a></li>
+									</ul>
+								</article>
+								<article>
+									<header>
+										<span class="date">April 22, 2017</span>
+										<h2><a href="#">Primis eget<br />
+										imperdiet lorem</a></h2>
+									</header>
+									<a href="#" class="image fit"><img src="images/pic03.jpg" alt="" /></a>
+									<p>Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis magna etiam.</p>
+									<ul class="actions special">
+										<li><a href="#" class="button">Full Story</a></li>
+									</ul>
+								</article>
+								<article>
+									<header>
+										<span class="date">April 18, 2017</span>
+										<h2><a href="#">Ante mattis<br />
+										interdum dolor</a></h2>
+									</header>
+									<a href="#" class="image fit"><img src="images/pic04.jpg" alt="" /></a>
+									<p>Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis magna etiam.</p>
+									<ul class="actions special">
+										<li><a href="#" class="button">Full Story</a></li>
+									</ul>
+								</article>
+								<article>
+									<header>
+										<span class="date">April 14, 2017</span>
+										<h2><a href="#">Tempus sed<br />
+										nulla imperdiet</a></h2>
+									</header>
+									<a href="#" class="image fit"><img src="images/pic05.jpg" alt="" /></a>
+									<p>Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis magna etiam.</p>
+									<ul class="actions special">
+										<li><a href="#" class="button">Full Story</a></li>
+									</ul>
+								</article>
+								<article>
+									<header>
+										<span class="date">April 11, 2017</span>
+										<h2><a href="#">Odio magna<br />
+										sed consectetur</a></h2>
+									</header>
+									<a href="#" class="image fit"><img src="images/pic06.jpg" alt="" /></a>
+									<p>Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis magna etiam.</p>
+									<ul class="actions special">
+										<li><a href="#" class="button">Full Story</a></li>
+									</ul>
+								</article>
+								<article>
+									<header>
+										<span class="date">April 7, 2017</span>
+										<h2><a href="#">Augue lorem<br />
+										primis vestibulum</a></h2>
+									</header>
+									<a href="#" class="image fit"><img src="images/pic07.jpg" alt="" /></a>
+									<p>Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis magna etiam.</p>
+									<ul class="actions special">
+										<li><a href="#" class="button">Full Story</a></li>
+									</ul>
+								</article>
+							</section>
+						-->
+						<!-- Footer
+							<footer>
+								<div class="pagination">
+									<a href="#" class="previous">Prev</a>
+									<a href="#" class="page active">1</a>
+									<a href="#" class="page">2</a>
+									<a href="#" class="page">3</a>
+									<span class="extra">&hellip;</span>
+									<a href="#" class="page">8</a>
+									<a href="#" class="page">9</a>
+									<a href="#" class="page">10</a>
+									<a href="#" class="next">Next</a>
+								</div>
+							</footer>
+						
+					</div>
+				-->
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							<form method="post" action="#">
+								<div class="fields">
+									<div class="field">
+										<label for="name">Name</label>
+										<input type="text" name="name" id="name" />
+									</div>
+									<div class="field">
+										<label for="email">Email</label>
+										<input type="text" name="email" id="email" />
+									</div>
+									<div class="field">
+										<label for="message">Message</label>
+										<textarea name="message" id="message" rows="3"></textarea>
+									</div>
+								</div>
+								<ul class="actions">
+									<div class="popup" onclick="popUp()">Submit
+										<span class="popuptext" id="myPopup">Form Submitted!</span>
+									  </div>
+								</ul>
+							</form>
+						</section>
+						<section class="split contact">
+							<section class="alt">
+								<h3>Address</h3>
+								<p>2 Cassel Court<br />
+								Haverton Hill Road</p>
+							</section>
+							<section>
+								<h3>Email</h3>
+								<p><a href="#">BonBonBPP@github.io</a></p>
+							</section>
+							<section>
+								<h3>Social</h3>
+								<ul class="icons alt">
+									<!--<li><a href="#" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>-->
+									<!--<li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>-->
+									<!--<li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>-->
+									<li><a href="https://github.com/BonBonBPP" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+								</ul>
+							</section>
+						</section>
+					</footer>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Bon Bon</li><li>Design: <a href="index.html">Bon Bon</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script>
+				// When the user clicks on div, open the popup
+				function popUp() {
+				  var popup = document.getElementById("myPopup");
+				  popup.classList.toggle("show");
+				}
+				</script>
+
+	</body>
+</html>
